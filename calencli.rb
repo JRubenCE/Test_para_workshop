@@ -110,27 +110,98 @@ events = [
 #   puts "#{date} #{events.map { |event| event["title"] }.join(', ')}"
 # end
 
-puts "#{"-" * 30} Welcome to CalenCLI #{"-" * 30}"
+def list_events(events)
+  puts "#{'-' * 29}Welcome to CalenCLI#{'-' * 29}\n\n"
 
-events.each do |event|
-  start_date_time = DateTime.parse(event["start_date"])
-  
-  time_events  = start_date_time.strftime('%a %b %d')
+  grouped_events = events.group_by { |event| DateTime.parse(event["start_date"]).strftime("%a %b %e") }
 
-  puts "#{time_events} #{" "*30} #{event["title"]} (#{event["id"]})"       
-  # puts "#{event["title"]}"
-  # puts "#{event["end_date"]}"
-  # puts "#{event["guests"]}"
-  # puts "#{event["calendar"]}"
-end 
+  grouped_events.each do |date, event|
+    event.each_with_index do |event, index|
+      if index == 0 
+        print date
+      else
+        print "          "
+      end
+      unless event["end_date"].empty?
+        print "#{ DateTime.parse(event["start_date"]).strftime("%k:%M")} - #{ DateTime.parse(event["end_date"]).strftime("%k:%M")}" 
+      else
+        print " " * 13
+      end
+      puts "   #{event["title"]} (#{event["id"]})\n"
+    end
+  end
+end
 
     # "#{event["id"]} - #{event["start_date"]}" 
   def print_menu_cal
     puts "\n"
     puts "-" * 78
     puts "list | create | show | update | delete | next | prev | exit"
-    puts "\n"
+    
     print "action: "
     gets.chomp.strip
   end
+  list_events(events)
+  action = nil 
+  while action != "exit"
+    action = print_menu_cal
+    case action
+    when "list"                            
+    #metodo: list_events(events)
+    list_events(events)    
+
+    when "create"
+    # metodo: create_events(events, id=id.next,variable1,...variablex) (que seria casi lo mismo que el update)
+    puts "ingrese date:"
+    puts "ingrese title:"
+    puts "ingrese calendar: (se puede dejar en blanco)"
+    print "ingrese star_end: (se puede dejar en blanco"
+    puts " para que coja todo el día)"
+    puts "ingrese notes: (se puede dejar en blanco)"
+    puts "ingrese guests: (se puede dejar en blanco)"
+    # add_events(events,id)
+    print " vuelve a mostrar el menu 'lista|create|etc"
+
+    when "show"
+    # metodo: show_events(events, completed: true)
+    print "aca muestra los datos de acuerdo"
+    puts "al id inputeado"
+    print " vuelve a mostrar el menu 'lista|create|etc"
     
+    when "update"
+    # agarro el metodo grab_ids para obtener el id                            
+    # ids = grab_ids
+    #metodo: update_events(ids, events)
+    ## y escribo todos los datos
+    puts "ingreso el id existente"
+    print "y aca recibe todos los datos"
+    puts " a agregar"
+    print " vuelve a mostrar el menu 'lista|create|etc"
+
+    when "delete"
+    # agarro el metodo grab_ids para obtener el id
+    # ids = grab_ids
+    #metodo: delete_todos(ids, events)
+    puts "ingreso el id existente que deseo borrar"
+    puts " vuelve a mostrar el menu 'lista|create|etc"
+
+    when "next"
+    # no estoy seguro :v ids = grab_ids
+    # deberia ser un metodo que muestre los siguientes 7 dias
+    # next_events(events)
+    print "se debería mostrar los siguientes 7 dias"
+    puts " vuelve a mostrar el menu 'list|create|etc"
+
+    when "prev"
+    # no estoy seguro :v ids = grab_ids
+    # deberia ser un metodo que muestre los siguientes 7 dias
+    #prev_events(events)
+    print "se debería mostrar los anteriores 7 días"
+    puts " vuelve a mostrar el menu 'list|create|etc"
+    when "exit"
+    puts "*secierraelprograma*"
+
+    else
+    puts "Invalid action"
+    end
+  end

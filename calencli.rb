@@ -141,6 +141,17 @@ end
     print "action: "
     gets.chomp.strip
   end
+
+  def delete_events(ids, events)
+    events.delete_if do |event|
+      ids.include?(event["id"])
+    end
+  end
+  def grab_ids
+    print "Event ID: "
+    gets.chomp.split(",").map(&:to_i)
+  end
+
   list_events(events)
   action = nil 
   while action != "exit"
@@ -181,9 +192,9 @@ end
     when "delete"
     # agarro el metodo grab_ids para obtener el id
     # ids = grab_ids
-    #metodo: delete_todos(ids, events)
-    puts "ingreso el id existente que deseo borrar"
-    puts " vuelve a mostrar el menu 'lista|create|etc"
+    #metodo: delete_events(ids, events)
+    ids = grab_ids
+    delete_events(ids, events)
 
     when "next"
     # no estoy seguro :v ids = grab_ids
@@ -199,8 +210,7 @@ end
     print "se debería mostrar los anteriores 7 días"
     puts " vuelve a mostrar el menu 'list|create|etc"
     when "exit"
-    puts "*secierraelprograma*"
-
+    
     else
     puts "Invalid action"
     end

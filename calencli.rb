@@ -113,23 +113,78 @@ events = [
 def list_events(events)
   puts "#{'-' * 29}Welcome to CalenCLI#{'-' * 29}\n\n"
 
-  grouped_events = events.group_by { |event| DateTime.parse(event["start_date"]).strftime("%a %b %e") }
+  today = Date.today
+day_of_the_week = today.wday #6
+last_sunday = today - day_of_the_week
 
-  grouped_events.each do |date, event|
-    event.each_with_index do |event, index|
-      if index == 0 
-        print date
-      else
-        print "          "
-      end
-      unless event["end_date"].empty?
-        print "#{ DateTime.parse(event["start_date"]).strftime("%k:%M")} - #{ DateTime.parse(event["end_date"]).strftime("%k:%M")}" 
-      else
-        print " " * 13
-      end
-      puts "   #{event["title"]} (#{event["id"]})\n"
-    end
+days_of_the_weeks = [] 
+
+(1..7).each do |i|
+  days_of_the_weeks.push(last_sunday + i)
+end 
+
+
+events_by_week = [[],[],[],[],[],[],[]]
+
+
+days_of_the_weeks.each_with_index do |day,index| 
+
+  events.each do |event|
+     if day == Date.parse(event["start_date"])
+      events_by_week[index].push(event)
+     end 
+
   end
+end
+
+
+events_by_week_aux = []
+events_by_week.each_with_index do |events_by_day, index|
+  events_by_day = events_by_day.sort_by do |event|
+                    DateTime.parse(event["start_date"])
+                  end 
+  events_by_week_aux.push(events_by_day)
+end 
+
+
+events_by_week = events_by_week_aux
+events_by_week.each_with_index do |day,index|
+  print days_of_the_weeks[index].strftime("%a %b %e")
+  if events_by_week[index].empty?
+    print " "*15 
+    print "No events"
+  else
+      day.each_with_index do |day, index1|
+      start_hour = DateTime.parse(day["start_date"]) 
+      start_hour_string = start_hour.strftime("%H:%M")
+      condition_fullday = day["end_date"] == ""
+
+      if index1 == 0 && condition_fullday
+        print " "*15
+        puts "#{day["title"]} (#{day["id"]})"
+      elsif index1 > 0 && !condition_fullday
+       print " "*11
+
+       end_hour = DateTime.parse(day["end_date"]) 
+       end_hour_string =end_hour.strftime("%H:%M")
+       print "#{start_hour_string} - #{end_hour_string} "
+       puts "#{day["title"]} (#{day["id"]})"
+      elsif index1 == 0 && !condition_fullday
+       print " "*1
+       end_hour = DateTime.parse(day["end_date"]) 
+       end_hour_string =end_hour.strftime("%H:%M")
+       print "#{start_hour_string} - #{end_hour_string} "
+       puts "#{day["title"]} (#{day["id"]})"
+      else 
+       print " "*25
+       puts "#{day["title"]} (#{day["id"]})"
+      end
+     end
+  end
+
+
+
+end
 end
 
     # "#{event["id"]} - #{event["start_date"]}" 
@@ -150,6 +205,23 @@ end
   def grab_ids
     print "Event ID: "
     gets.chomp.split(",").map(&:to_i)
+  end
+  def show_events(ids,events)
+    
+    found_event = events.find { |event| event["id"] == ids[0] }
+    if found_event
+      puts "Title: #{found_event["title"]}"
+      puts "calendar: #{found_event["calendar"]}"
+      unless found_event["end_date"].empty?
+      puts "star_end: #{ DateTime.parse(found_event["start_date"]).strftime("%k:%M")}  #{ DateTime.parse(found_event["end_date"]).strftime("%k:%M")}" 
+      else
+      puts "star_end: "
+      end        
+      puts "notes:  #{found_event["notes"]}"
+      puts "guests:  #{found_event["guests"]}"
+    else
+      puts "Invalid ID"
+    end     
   end
 
   list_events(events)
@@ -174,11 +246,9 @@ end
     print " vuelve a mostrar el menu 'lista|create|etc"
 
     when "show"
-    # metodo: show_events(events, completed: true)
-    print "aca muestra los datos de acuerdo"
-    puts "al id inputeado"
-    print " vuelve a mostrar el menu 'lista|create|etc"
-    
+    ids = grab_ids
+    show_events(ids,events)
+        
     when "update"
     # agarro el metodo grab_ids para obtener el id                            
     # ids = grab_ids

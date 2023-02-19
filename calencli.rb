@@ -104,55 +104,49 @@ events = [
 ]
 
 
-# events_by_date = events.group_by { |event| DateTime.parse(event["start_date"]).strftime('%a %b %d') }
-
-# events_by_date.each do |date, events|
-#   puts "#{date} #{events.map { |event| event["title"] }.join(', ')}"
-# end
-
 def list_events(events)
   puts "#{'-' * 29}Welcome to CalenCLI#{'-' * 29}\n\n"
 
   today = Date.today
-day_of_the_week = today.wday #6
-last_sunday = today - day_of_the_week
+  day_of_the_week = today.wday #6
+  last_sunday = today - day_of_the_week
 
-days_of_the_weeks = [] 
+  days_of_the_weeks = [] 
 
-(1..7).each do |i|
+  (1..7).each do |i|
   days_of_the_weeks.push(last_sunday + i)
-end 
+  end 
 
 
-events_by_week = [[],[],[],[],[],[],[]]
+ events_by_week = [[],[],[],[],[],[],[]]
 
 
-days_of_the_weeks.each_with_index do |day,index| 
+ days_of_the_weeks.each_with_index do |day,index| 
 
-  events.each do |event|
+    events.each do |event|
      if day == Date.parse(event["start_date"])
       events_by_week[index].push(event)
      end 
 
+    end
   end
-end
 
 
-events_by_week_aux = []
-events_by_week.each_with_index do |events_by_day, index|
+  events_by_week_aux = []
+  events_by_week.each_with_index do |events_by_day, index|
   events_by_day = events_by_day.sort_by do |event|
                     DateTime.parse(event["start_date"])
                   end 
   events_by_week_aux.push(events_by_day)
-end 
+  end 
 
 
-events_by_week = events_by_week_aux
-events_by_week.each_with_index do |day,index|
+  events_by_week = events_by_week_aux
+  events_by_week.each_with_index do |day,index|
   print days_of_the_weeks[index].strftime("%a %b %e")
   if events_by_week[index].empty?
     print " "*15 
-    print "No events"
+    puts "No events"
   else
       day.each_with_index do |day, index1|
       start_hour = DateTime.parse(day["start_date"]) 
@@ -180,14 +174,9 @@ events_by_week.each_with_index do |day,index|
        puts "#{day["title"]} (#{day["id"]})"
       end
      end
+    end
   end
-
-
-
 end
-end
-
-    # "#{event["id"]} - #{event["start_date"]}" 
   def print_menu_cal
     puts "\n"
     puts "-" * 78
